@@ -6,7 +6,7 @@ Esta aplicação implementa o fluxo de autorização OAuth 2.0 do HubSpot usando
 
 ## 📋 Pré-requisitos
 
-- Java 11+
+- Java 17+
 - Maven 3.6+
 - Conta de desenvolvedor no [HubSpot](https://developers.hubspot.com/) (para obter `client.id` e `client.secret`).
 
