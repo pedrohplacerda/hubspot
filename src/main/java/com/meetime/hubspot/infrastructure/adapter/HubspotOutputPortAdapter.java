@@ -15,9 +15,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 
 import static org.apache.tomcat.util.http.fileupload.FileUploadBase.CONTENT_TYPE;
-import static org.apache.tomcat.util.http.fileupload.FileUploadBase.FORM_DATA;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 
 @Service
 public class HubspotOutputPortAdapter implements HubspotOutputPort {
