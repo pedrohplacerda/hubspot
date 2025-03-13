@@ -60,6 +60,16 @@ Também pode adicionar como VM Options do intelliJ.
 | `lastName`  | String | Sobrenome do contato          | Sim         |
 | `phone`     | String | Número de telefone do contato | Não         |
 
+Exemplo de corpo de requisição:
+
+```json
+{
+    "email": "pedro@meetime.com",
+    "lastname": "lacerda",
+    "firstname": "pedro"
+}
+```
+
 ## 🔍 Testando o fluxo de criação de contato
 
 - Acesse http://localhost:8080/meetime-hubspot/create/contact para obter a URL de autorização.
