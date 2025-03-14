@@ -52,7 +52,8 @@ public class HubspotOutputPortAdapter implements HubspotOutputPort {
                                     @Value("${hubspot.token.url}") String tokenUrl,
                                     @Value("${hubspot.create.contact.url}") String contactCreationUrl,
                                     HttpClient httpClient,
-                                    ObjectMapper objectMapper, HubspotRateLimiter hubspotRateLimiter
+                                    ObjectMapper objectMapper,
+                                    HubspotRateLimiter hubspotRateLimiter
     ) {
         this.authUrl = authUrl;
         this.clientId = clientId;
