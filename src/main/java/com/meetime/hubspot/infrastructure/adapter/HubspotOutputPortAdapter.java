@@ -68,6 +68,7 @@ public class HubspotOutputPortAdapter implements HubspotOutputPort {
 
     @Override
     public String createAuthUrl() {
+        var teste = "teste";
         return authUrl;
     }
 
