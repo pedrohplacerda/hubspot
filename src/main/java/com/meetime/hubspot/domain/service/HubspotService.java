@@ -1,5 +1,6 @@
 package com.meetime.hubspot.domain.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meetime.hubspot.domain.model.AccessToken;
 import com.meetime.hubspot.domain.model.AuthUrl;
 import com.meetime.hubspot.domain.model.ContactCreationRequest;
@@ -16,13 +17,14 @@ import java.io.IOException;
 public class HubspotService {
 
     private final HubspotOutputPortAdapter hubspotOutputPortAdapter;
+    private final ObjectMapper objectMapper;
 
     public AuthUrl getAuthUrl() {
         return new AuthUrl(hubspotOutputPortAdapter.createAuthUrl());
     }
 
     public AccessToken getAccessToken(String authorizationCode) throws IOException, HubspotOutputAdapterException {
-        return new AccessToken(hubspotOutputPortAdapter.generateAccessToken(authorizationCode));
+        return objectMapper.readValue(hubspotOutputPortAdapter.generateAccessToken(authorizationCode), AccessToken.class);
     }
 
     public ContactCreationResponse createContact(ContactCreationRequest contactCreationRequest, String accessToken) throws IOException, HubspotOutputAdapterException {

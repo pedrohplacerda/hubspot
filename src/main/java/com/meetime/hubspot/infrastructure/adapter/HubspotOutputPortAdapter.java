@@ -9,6 +9,7 @@ import com.meetime.hubspot.infrastructure.config.HubspotRateLimiter;
 import com.meetime.hubspot.infrastructure.exception.HubspotOutputAdapterException;
 import com.meetime.hubspot.infrastructure.exception.HubspotOutputAdapterRuntimeException;
 import com.meetime.hubspot.infrastructure.model.ExceptionMessageEnum;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 
+@Slf4j
 @Service
 public class HubspotOutputPortAdapter implements HubspotOutputPort {
 
@@ -90,6 +92,7 @@ public class HubspotOutputPortAdapter implements HubspotOutputPort {
 
     @Override
     public ContactCreationResponse createContact(ContactCreationRequest contactCreationRequest, String accessToken) throws IOException, HubspotOutputAdapterException {
+        log.info("Creating user...");
         String requestBody = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(contactCreationRequest);
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(contactCreationUrl))
@@ -101,14 +104,17 @@ public class HubspotOutputPortAdapter implements HubspotOutputPort {
             hubspotRateLimiter.acquire();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == HttpStatus.CREATED.value()) {
+                log.info("User created successfully.");
                 updateRateLimiter(response.headers());
                 return parseContactCreationResponse(response.body());
             } else if (response.statusCode() == HttpStatus.TOO_MANY_REQUESTS.value()) {
+                log.error("Rate limit exceeded.");
                 handleRateLimitExceeded(response.headers());
                 throw new HubspotOutputAdapterRuntimeException(ExceptionMessageEnum.RATE_LIMIT_EXCEPTION_MESSAGE.getMessage());
             }
             handleUnexpectedStatus(response);
         } catch (InterruptedException e) {
+            log.error("Error while crating user. {}", e.getMessage());
             Thread.currentThread().interrupt();
             throw new HubspotOutputAdapterException(e.getMessage());
         }

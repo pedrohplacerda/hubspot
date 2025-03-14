@@ -1,14 +1,12 @@
 package com.meetime.hubspot.domain.model;
 
-import lombok.Data;
+import java.util.Map;
 
-@Data
-public class ContactCreationResponse {
-    private String createdAt;
-    private Boolean archived;
-    private String archivedAt;
-    private Object propertiesWithHistory;
-    private String id;
-    private Object properties;
-    private String updatedAt;
+public record ContactCreationResponse(String createdAt,
+                                      Boolean archived,
+                                      String archivedAt,
+                                      Map<String, Object> propertiesWithHistory,
+                                      String id,
+                                      Map<String, Object> properties,
+                                      String updatedAt) {
 }
