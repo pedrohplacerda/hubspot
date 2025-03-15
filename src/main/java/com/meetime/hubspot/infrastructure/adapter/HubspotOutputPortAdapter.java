@@ -9,6 +9,7 @@ import com.meetime.hubspot.infrastructure.config.HubspotRateLimiter;
 import com.meetime.hubspot.infrastructure.exception.HubspotOutputAdapterException;
 import com.meetime.hubspot.infrastructure.exception.HubspotOutputAdapterRuntimeException;
 import com.meetime.hubspot.infrastructure.model.ExceptionMessageEnum;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -33,42 +34,27 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class HubspotOutputPortAdapter implements HubspotOutputPort {
 
+    @Value("${hubspot.auth.url}")
     private final String authUrl;
+    @Value("${hubspot.client.id}")
     private final String clientId;
+    @Value("${hubspot.client.secret}")
     private final String clientSecret;
+    @Value("${hubspot.redirect.uri}")
     private final String redirectUri;
+    @Value("${hubspot.token.url}")
     private final String tokenUrl;
+    @Value("${hubspot.create.contact.url}")
     private final String contactCreationUrl;
     private final HttpClient httpClient;
     private final ObjectMapper objectMapper;
     private final HubspotRateLimiter hubspotRateLimiter;
 
-    public HubspotOutputPortAdapter(@Value("${hubspot.auth.url}") String authUrl,
-                                    @Value("${hubspot.client.id}") String clientId,
-                                    @Value("${hubspot.client.secret}") String clientSecret,
-                                    @Value("${hubspot.redirect.uri}") String redirectUri,
-                                    @Value("${hubspot.token.url}") String tokenUrl,
-                                    @Value("${hubspot.create.contact.url}") String contactCreationUrl,
-                                    HttpClient httpClient,
-                                    ObjectMapper objectMapper,
-                                    HubspotRateLimiter hubspotRateLimiter
-    ) {
-        this.authUrl = authUrl;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.redirectUri = redirectUri;
-        this.tokenUrl = tokenUrl;
-        this.contactCreationUrl = contactCreationUrl;
-        this.httpClient = httpClient;
-        this.objectMapper = objectMapper;
-        this.hubspotRateLimiter = hubspotRateLimiter;
-    }
-
     @Override
     public String createAuthUrl() {
-        var teste = "teste";
         return authUrl;
     }
 
