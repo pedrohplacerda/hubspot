@@ -1,4 +1,4 @@
-package com.meetime.hubspot.infrastructure.exception;
+package com.meetime.hubspot.infrastructure.http.exception;
 
 public class HubspotOutputAdapterException extends Exception {
     public HubspotOutputAdapterException(String message) {

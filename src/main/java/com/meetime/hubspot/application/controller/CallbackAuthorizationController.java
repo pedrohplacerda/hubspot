@@ -1,8 +1,8 @@
 package com.meetime.hubspot.application.controller;
 
-import com.meetime.hubspot.domain.model.AccessToken;
+import com.meetime.hubspot.domain.model.auth.AccessToken;
 import com.meetime.hubspot.domain.service.HubspotService;
-import com.meetime.hubspot.infrastructure.exception.HubspotOutputAdapterException;
+import com.meetime.hubspot.infrastructure.http.exception.HubspotOutputAdapterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

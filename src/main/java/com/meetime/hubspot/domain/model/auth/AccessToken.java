@@ -1,4 +1,4 @@
-package com.meetime.hubspot.domain.model;
+package com.meetime.hubspot.domain.model.auth;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;

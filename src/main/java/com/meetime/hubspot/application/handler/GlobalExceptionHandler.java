@@ -1,6 +1,6 @@
 package com.meetime.hubspot.application.handler;
 
-import com.meetime.hubspot.infrastructure.exception.HubspotOutputAdapterRuntimeException;
+import com.meetime.hubspot.infrastructure.http.exception.HubspotOutputAdapterRuntimeException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

@@ -1,12 +1,12 @@
 package com.meetime.hubspot.domain.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.meetime.hubspot.domain.model.AccessToken;
-import com.meetime.hubspot.domain.model.AuthUrl;
-import com.meetime.hubspot.domain.model.ContactCreationRequest;
-import com.meetime.hubspot.domain.model.ContactCreationResponse;
-import com.meetime.hubspot.infrastructure.adapter.HubspotOutputPortAdapter;
-import com.meetime.hubspot.infrastructure.exception.HubspotOutputAdapterException;
+import com.meetime.hubspot.domain.model.auth.AccessToken;
+import com.meetime.hubspot.domain.model.auth.AuthUrl;
+import com.meetime.hubspot.domain.model.contact.ContactCreationRequest;
+import com.meetime.hubspot.domain.model.contact.ContactCreationResponse;
+import com.meetime.hubspot.infrastructure.http.adapter.HubspotOutputPortAdapter;
+import com.meetime.hubspot.infrastructure.http.exception.HubspotOutputAdapterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,4 +30,9 @@ public class HubspotService {
     public ContactCreationResponse createContact(ContactCreationRequest contactCreationRequest, String accessToken) throws IOException, HubspotOutputAdapterException {
         return hubspotOutputPortAdapter.createContact(contactCreationRequest, accessToken);
     }
+
+    public void processWebhook(String signature, String payload) {
+        hubspotOutputPortAdapter.processContactEventAsync(signature, payload);
+    }
+
 }

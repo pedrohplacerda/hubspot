@@ -1,4 +1,4 @@
-package com.meetime.hubspot.infrastructure.model;
+package com.meetime.hubspot.infrastructure.http.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

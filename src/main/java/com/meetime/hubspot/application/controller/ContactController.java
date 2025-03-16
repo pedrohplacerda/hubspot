@@ -1,9 +1,9 @@
 package com.meetime.hubspot.application.controller;
 
-import com.meetime.hubspot.domain.model.ContactCreationRequest;
-import com.meetime.hubspot.domain.model.ContactCreationResponse;
+import com.meetime.hubspot.domain.model.contact.ContactCreationRequest;
+import com.meetime.hubspot.domain.model.contact.ContactCreationResponse;
 import com.meetime.hubspot.domain.service.HubspotService;
-import com.meetime.hubspot.infrastructure.exception.HubspotOutputAdapterException;
+import com.meetime.hubspot.infrastructure.http.exception.HubspotOutputAdapterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +13,7 @@ import java.io.IOException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("meetime-hubspot/create/contact")
-public class CreateContactController {
+public class ContactController {
 
     private final HubspotService hubspotService;
 
