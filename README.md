@@ -145,7 +145,7 @@ Exemplo de corpo de requisição:
 
 # 🚀 Melhorias
 
-- Implementar fluxo que recupera o token de acesso para o processamento correto do webhook de criação de contato, buscando na api do hubspot as informações do contato criado para salvar no banco de dados localmente;
+- Implementar fluxo que recupera o token de acesso para o processamento correto do webhook de criação de contato, buscando na api do hubspot as informações do contato criado para salvar no banco de dados da meetime;
 - Criação de testes unitários, de integração e de mutação para garantir robustez e resiliência do código;
 - Modelagem do banco de dados para salvar as informações do contato criado para ser disponibilizado em outros fluxos da meetime;
 - Containerização da aplicação para facilitar o deploy em máquinas virtuais dentro do ambiente de cloud (EC2 da AWS e GCE do GCP);
