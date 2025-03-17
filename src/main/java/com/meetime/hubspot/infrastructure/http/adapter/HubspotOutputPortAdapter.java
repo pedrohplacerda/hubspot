@@ -1,11 +1,9 @@
 package com.meetime.hubspot.infrastructure.http.adapter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.meetime.hubspot.application.port.HubspotOutputPort;
 import com.meetime.hubspot.domain.model.contact.ContactCreationRequest;
-import com.meetime.hubspot.domain.model.contact.ContactCreationResponse;
 import com.meetime.hubspot.domain.model.webhook.Contact;
 import com.meetime.hubspot.domain.model.webhook.ContactCreationWebhookRequest;
 import com.meetime.hubspot.infrastructure.config.HubspotRateLimiter;
@@ -28,8 +26,7 @@ import java.net.http.HttpResponse;
 import java.util.List;
 
 import static com.meetime.hubspot.infrastructure.constants.InfrastructureConstants.*;
-import static com.meetime.hubspot.infrastructure.http.model.ExceptionMessageEnum.ERROR_CREATING_CONTACT;
-import static com.meetime.hubspot.infrastructure.http.model.ExceptionMessageEnum.UNAUTHORIZED_MESSAGE;
+import static com.meetime.hubspot.infrastructure.http.model.ExceptionMessageEnum.*;
 import static com.meetime.hubspot.infrastructure.utils.InfrastructureUtils.getParams;
 import static com.meetime.hubspot.infrastructure.utils.InfrastructureUtils.handleUnexpectedStatus;
 import static org.apache.tomcat.util.http.fileupload.FileUploadBase.CONTENT_TYPE;
@@ -96,7 +93,7 @@ public class HubspotOutputPortAdapter implements HubspotOutputPort {
     }
 
     @Override
-    public ContactCreationResponse createContact(ContactCreationRequest contactCreationRequest, String accessToken) throws IOException, HubspotOutputAdapterException {
+    public String createContact(ContactCreationRequest contactCreationRequest, String accessToken) throws IOException, HubspotOutputAdapterException {
         log.info("Creating user...");
         String requestBody = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(contactCreationRequest);
         HttpRequest request = HttpRequest.newBuilder()
@@ -111,7 +108,7 @@ public class HubspotOutputPortAdapter implements HubspotOutputPort {
             if (response.statusCode() == HttpStatus.CREATED.value()) {
                 log.info("User created successfully.");
                 updateRateLimiter(response.headers());
-                return parseContactCreationResponse(response.body());
+                return response.body();
             } else if (response.statusCode() == HttpStatus.TOO_MANY_REQUESTS.value()) {
                 log.error("Rate limit exceeded.");
                 handleRateLimitExceeded(response.headers());
@@ -126,12 +123,37 @@ public class HubspotOutputPortAdapter implements HubspotOutputPort {
         throw new HubspotOutputAdapterRuntimeException(ERROR_CREATING_CONTACT.getMessage());
     }
 
+    @Async
     @Override
-    public Contact fetchContactDetails(Long contactId) {
+    public Contact processContactEventAsync(String signature, String payload) throws HubspotOutputAdapterException {
+        if (!InfrastructureUtils.isValidSignature(signature, payload, clientSecret)) {
+            throw new HubspotOutputAdapterRuntimeException(UNAUTHORIZED_MESSAGE.getMessage());
+        }
+        try {
+            List<ContactCreationWebhookRequest> contactWebhookRequest = objectMapper.readValue(payload, new TypeReference<>() {
+            });
+            ContactCreationWebhookRequest event = contactWebhookRequest.getFirst();
+            if (CONTACT_CREATION.equals(event.eventType())) {
+                log.info("Processing contact creation. Id: {}...", event.contactId());
+                Contact contact = processContactDetails(fetchContactDetails(event.contactId(), ""));
+                log.info("Contact creation processed successfully.");
+                return contact;
+            }
+        } catch (Exception e) {
+            log.error("An error happened while processing the event.", e);
+            throw new HubspotOutputAdapterRuntimeException(e.getMessage());
+        }
+        throw new HubspotOutputAdapterException(INTERNAL_SERVER_ERROR_MESSAGE.getMessage());
+    }
+
+    // TODO: verify why the contact is being created but when requested it comes with null lastname, firstname and email
+    private Contact fetchContactDetails(Long contactId, String accessToken) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(hubspotApiUrl + "/crm/v3/objects/contacts/" + contactId))
                     .header(ACCEPT, APPLICATION_JSON_VALUE)
+                    // TODO: remove hardcoded accessToken
+                    .header(AUTHORIZATION, String.format(BEARER, accessToken))
                     .GET()
                     .build();
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
@@ -142,30 +164,10 @@ public class HubspotOutputPortAdapter implements HubspotOutputPort {
         }
     }
 
-    @Override
-    public void processContactDetails(Contact contact) {
+    private Contact processContactDetails(Contact contact) {
+        // TODO: implement database contact saving method
         log.info("User created in database.");
-    }
-
-    @Async
-    @Override
-    public void processContactEventAsync(String signature, String payload) {
-        if (!InfrastructureUtils.isValidSignature(signature, payload, clientSecret)) {
-            throw new HubspotOutputAdapterRuntimeException(UNAUTHORIZED_MESSAGE.getMessage());
-        }
-        try {
-            List<ContactCreationWebhookRequest> contactWebhookRequest = objectMapper.readValue(payload, new TypeReference<>() {
-            });
-            ContactCreationWebhookRequest event = contactWebhookRequest.getFirst();
-            if (CONTACT_CREATION.equals(event.eventType())) {
-                log.info("Processing contact creation. Id: {}...", event.contactId());
-                processContactDetails(fetchContactDetails(event.contactId()));
-                log.info("Contact creation processed successfully.");
-            }
-        } catch (Exception e) {
-            log.error("An error happened while processing the event.", e);
-            throw new HubspotOutputAdapterRuntimeException(e.getMessage());
-        }
+        return contact;
     }
 
     private void updateRateLimiter(HttpHeaders headers) {
@@ -177,9 +179,5 @@ public class HubspotOutputPortAdapter implements HubspotOutputPort {
     private void handleRateLimitExceeded(HttpHeaders headers) {
         long retryAfter = Long.parseLong(headers.firstValue(RETRY_AFTER).orElse("60"));
         hubspotRateLimiter.handleRateLimitExceeded(retryAfter * 1000);
-    }
-
-    private ContactCreationResponse parseContactCreationResponse(String response) throws JsonProcessingException {
-        return objectMapper.readValue(response, ContactCreationResponse.class);
     }
 }

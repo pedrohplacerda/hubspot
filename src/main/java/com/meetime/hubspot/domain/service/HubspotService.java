@@ -5,6 +5,7 @@ import com.meetime.hubspot.domain.model.auth.AccessToken;
 import com.meetime.hubspot.domain.model.auth.AuthUrl;
 import com.meetime.hubspot.domain.model.contact.ContactCreationRequest;
 import com.meetime.hubspot.domain.model.contact.ContactCreationResponse;
+import com.meetime.hubspot.domain.model.webhook.Contact;
 import com.meetime.hubspot.infrastructure.http.adapter.HubspotOutputPortAdapter;
 import com.meetime.hubspot.infrastructure.http.exception.HubspotOutputAdapterException;
 import lombok.RequiredArgsConstructor;
@@ -28,11 +29,11 @@ public class HubspotService {
     }
 
     public ContactCreationResponse createContact(ContactCreationRequest contactCreationRequest, String accessToken) throws IOException, HubspotOutputAdapterException {
-        return hubspotOutputPortAdapter.createContact(contactCreationRequest, accessToken);
+        return objectMapper.readValue(hubspotOutputPortAdapter.createContact(contactCreationRequest, accessToken), ContactCreationResponse.class);
     }
 
-    public void processWebhook(String signature, String payload) {
-        hubspotOutputPortAdapter.processContactEventAsync(signature, payload);
+    public Contact processWebhook(String signature, String payload) throws HubspotOutputAdapterException {
+        return hubspotOutputPortAdapter.processContactEventAsync(signature, payload);
     }
 
 }
