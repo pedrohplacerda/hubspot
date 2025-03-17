@@ -82,7 +82,8 @@ Exemplo de corpo de requisição:
 - Caso retorne sucesso (201) a aplicação retornará o seguinte corpo:
 
 ```json lines
-{"createdAt":"2025-03-13T23:04:46.122Z",
+{
+  "createdAt":"2025-03-13T23:04:46.122Z",
   "archived":false,
   "archivedAt":null,
   "propertiesWithHistory":null,"id":"105890692533",
