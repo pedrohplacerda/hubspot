@@ -1,7 +1,11 @@
-# meetime-hubspot-integration
+# ❇️ meetime-hubspot-integration
 
-Esta aplicação implementa o fluxo de autorização OAuth 2.0 do HubSpot usando Java e Spring Boot. Ela expõe dois
-endpoints para gerar a URL de autorização e trocar o código de autorização por um token de acesso.
+Esta aplicação faz integração com apis do Hubspot para:
+
+- criar uma url de autenticação parar seguir com o *authorization code flow*
+- criar um callback parar finalizar o *authorization code flow* e trocar por um token de aceso
+- criar um contato utilizando api **/crm/v3/objects/contacts/{contactId}** e o token de acesso obtido através do *authorization code flow*
+- escutar o webhook de criação de contato a partir da requisição feita para a api do Hubspot
 
 ---
 
@@ -11,6 +15,7 @@ endpoints para gerar a URL de autorização e trocar o código de autorização 
 - Maven 3.6+
 - Conta de desenvolvedor no [HubSpot](https://developers.hubspot.com/) (para obter `client.id` e `client.secret`).
 - Lombok para esconder códigos boilerplate e manter o código mais limpo
+- [ngrok](https://dashboard.ngrok.com/get-started/setup/windows) para expor o servidor local (http://localhost:8080) em um domínio https para testar os webhooks
 
 ---
 
@@ -35,6 +40,8 @@ mvn spring-boot:run -Dclient.id=SEU_CLIENT_ID -Dclient.secret=SEU_CLIENT_SECRET
 
 Também pode adicionar como VM Options do intelliJ.
 
+---
+
 ## 🔍 Testando o fluxo de autorização
 
 - Acesse http://localhost:8080/meetime-hubspot/auth para obter a URL de autorização.
@@ -44,6 +51,8 @@ Também pode adicionar como VM Options do intelliJ.
 - Após autorizar, você será redirecionado para http://localhost:8080/meetime-hubspot/callback?code=SEU_CODIGO.
 
 - A aplicação trocará o código por um token de acesso e exibirá a resposta.
+
+---
 
 # 📋 Fluxo de criação de contato
 
@@ -107,6 +116,41 @@ Exemplo de corpo de requisição:
 }
 ```
 
+---
+
+# 🪀 Fluxo que escuta os webhooks de criação de contato do hubspot
+
+## Configurações para testar localmente
+
+- Adicionar as variáveis de ambiente no VM Options
+
+```bash
+-Dhubspot.auth.url=https://app.hubspot.com/oauth/authorize?client_id=3eebdb05-ede1-49c2-af8b-925d6cc8a1f1&redirect_uri=http://localhost:8080/meetime-hubspot/callback&scope=crm.objects.contacts.write%20oauth%20crm.objects.companies.write%20crm.objects.companies.read%20crm.objects.contacts.read
+-Dclient.id=3eebdb05-ede1-49c2-af8b-925d6cc8a1f1
+-Dclient.secret=c164fc2d-0237-46c6-85cd-46a876cf14da
+-Dhubspot.redirect.uri=http://localhost:8080/meetime-hubspot/callback
+-Dhubspot.api.url=https://api.hubapi.com
+```
+- Executar o projeto localmente;
+- Executar o ngrok conforme o link acima para expor o servidor local num servidor efêmero https;
+- Configurar o webhook a ser enviado no [portal de aplicativos](https://app.hubspot.com/developer/49524927/application/9280840/webhooks1) da conta de developer. Indicar o servidor criado pelo ngrok;
+- Fazer uma chamada ao endpoint *GET meetime-hubspot/auth* para receber a url de autorização;
+- Copiar e colar a url de autorização no browser. Certifique-se que a conta hubspot logada ***não*** seja de desenvolvedor;
+- Parar a execução do aplicativo;
+- Copiar e colar o token retornado na tela do browser em dois lugares: 1 - header para a chamada ao endpoint de criação de contato. 2 - Na linha 138 da classe [HubspotOutputAdapter](src/main/java/com/meetime/hubspot/infrastructure/http/adapter/HubspotOutputPortAdapter.java) ***(solução temporária até implementar a lógica de callback para recuperar o token criado)***;
+- Executar o aplicativo localmente novamente;
+- Faça uma chamada ao endpoint *POST meetime-hubspot/create/contact* parar criar um contato;
+- O webhook será recebido e processado corretamente;
+
+---
+
+# 🚀 Melhorias
+
+- Implementar fluxo que recupera o token de acesso para o processamento correto do webhook de criação de contato, buscando na api do hubspot as informações do contato criado para salvar no banco de dados localmente;
+- Criação de testes unitários, de integração e de mutação para garantir robustez e resiliência do código;
+- Modelagem do banco de dados para salvar as informações do contato criado para ser disponibilizado em outros fluxos da meetime;
+- Containerização da aplicação para facilitar o deploy em máquinas virtuais dentro do ambiente de cloud (EC2 da AWS e GCE do GCP);
+- Melhorar o fluxo de criação da url de autorização para receber de maneira dinâmica o client.secret e client.id parar poder criar urls parar qualquer usuário que requisitar;
 
 
 
