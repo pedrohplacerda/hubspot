@@ -85,8 +85,7 @@ Exemplo de corpo de requisição:
 
 - Envie o corpo de requisição.
 
-- Insira o token de acesso recuperado no passo anterior (endpoint que de autorização /meetime-hubspot/auth) no HEADER "
-  accessToken".
+- Insira o token de acesso recuperado no passo anterior (endpoint que de autorização */meetime-hubspot/auth*) no HEADER "accessToken".
 
 - Caso retorne sucesso (201) a aplicação retornará o seguinte corpo:
 
