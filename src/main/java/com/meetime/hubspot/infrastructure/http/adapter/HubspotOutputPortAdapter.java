@@ -152,7 +152,7 @@ public class HubspotOutputPortAdapter implements HubspotOutputPort {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(hubspotApiUrl + "/crm/v3/objects/contacts/" + contactId))
                     .header(ACCEPT, APPLICATION_JSON_VALUE)
-                    // TODO: remove hardcoded accessToken
+                    // TODO: after implementing a way to retrieve another accessToken, remove hardcoded one
                     .header(AUTHORIZATION, String.format(BEARER, accessToken))
                     .GET()
                     .build();

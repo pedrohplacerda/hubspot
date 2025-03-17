@@ -6,4 +6,5 @@ public class InfrastructureConstants {
     public static final String X_HUB_SPOT_RATE_LIMIT_INTERVAL_MILLISECONDS = "X-HubSpot-RateLimit-Interval-Milliseconds";
     public static final String RETRY_AFTER = "Retry-After";
     public static final String CONTACT_CREATION = "contact.creation";
+    public static final String X_HUB_SPOT_SIGNATURE = "X-HubSpot-Signature";
 }
