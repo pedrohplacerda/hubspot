@@ -1,6 +1,6 @@
 package com.meetime.hubspot.infrastructure.utils;
 
-import com.meetime.hubspot.infrastructure.http.exception.HubspotOutputAdapterRuntimeException;
+import com.meetime.hubspot.infrastructure.http.exception.HubspotAdapterRuntimeException;
 import com.meetime.hubspot.infrastructure.http.model.ExceptionMessageEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -30,7 +30,7 @@ public class InfrastructureUtils {
             case HttpStatus.INTERNAL_SERVER_ERROR -> ExceptionMessageEnum.INTERNAL_SERVER_ERROR_MESSAGE.getMessage();
             default -> String.format(ExceptionMessageEnum.UNEXPECTED_STATUS_MESSAGE.getMessage(), statusCode.value());
         };
-        throw new HubspotOutputAdapterRuntimeException(exceptionMessage);
+        throw new HubspotAdapterRuntimeException(exceptionMessage);
     }
 
     public static boolean isValidSignature(String signature, String payload, String clientSecret) {

@@ -1,8 +1,8 @@
-package com.meetime.hubspot.application.controller;
+package com.meetime.hubspot.application.controller.auth;
 
 import com.meetime.hubspot.domain.model.auth.AccessToken;
-import com.meetime.hubspot.domain.service.HubspotService;
-import com.meetime.hubspot.infrastructure.http.exception.HubspotOutputAdapterException;
+import com.meetime.hubspot.domain.service.auth.HubspotAuthService;
+import com.meetime.hubspot.infrastructure.http.exception.HubspotAdapterException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +17,10 @@ import java.io.IOException;
 @RequestMapping("meetime-hubspot/callback")
 public class CallbackAuthorizationController {
 
-    private final HubspotService hubspotService;
+    private final HubspotAuthService hubspotService;
 
     @GetMapping
-    public ResponseEntity<AccessToken> createAccessToken(@RequestParam("code") String authorizationCode) throws IOException, HubspotOutputAdapterException {
+    public ResponseEntity<AccessToken> createAccessToken(@RequestParam("code") String authorizationCode) throws IOException, HubspotAdapterException, InterruptedException {
         return ResponseEntity.ok(hubspotService.getAccessToken(authorizationCode));
     }
 
