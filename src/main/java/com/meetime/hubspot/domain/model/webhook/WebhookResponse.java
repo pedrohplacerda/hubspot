@@ -1,4 +1,4 @@
-package com.meetime.hubspot.application.model;
+package com.meetime.hubspot.domain.model.webhook;
 
 import lombok.Builder;
 import lombok.Data;
